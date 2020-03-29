@@ -1,0 +1,1 @@
+Simple application to manage home budget
