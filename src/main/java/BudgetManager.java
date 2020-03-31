@@ -1,27 +1,22 @@
+import purchase.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 class BudgetManager {
     private double balance;
-    private Scanner scanner;
+    private String name;
+    private double price;
+    private Scanner scannerDouble;
     private Scanner scannerString;
-    private List<String> purchaseList;
+    private static double totalSum;
+    private static final List<Purchase> allPurchaseList = new ArrayList<>();
 
     public BudgetManager() {
-        this.scanner = new Scanner(System.in);
+        this.scannerDouble = new Scanner(System.in);
         this.scannerString = new Scanner(System.in);
-        this.purchaseList = new ArrayList<>();
         this.balance = 0;
-    }
-
-    public void chooseAction() {
-        System.out.println("Choose your action:");
-        System.out.println("1) Add income");
-        System.out.println("2) Add purchase");
-        System.out.println("3) Show list of purchase");
-        System.out.println("4) Balance");
-        System.out.println("0) Exit");
     }
 
     public double getBalance() {
@@ -35,25 +30,17 @@ class BudgetManager {
         }
     }
 
-    public void addPurchase() {
-        Scanner sc = new Scanner(System.in);
-        StringBuilder sb = new StringBuilder();
+    public void readPurchase(Scanner scanner1, Scanner scanner2) {
         System.out.println("Enter purchase name:");
-        String txt1 = sc.nextLine().trim();
+        this.name = scanner1.nextLine().trim();
         System.out.println("Enter its price:");
-        String txt3 = sc.nextLine().trim();
-        sb.append(txt1).append(" $").append(txt3);
+        this.price = scanner2.nextDouble();
         System.out.println("Purchase was added!\n");
-        purchaseList.add(sb.toString());
-        String[] tx = sb.toString().split("\\$");
-        balance-=Double.valueOf(tx[1]);
-
     }
 
-    public void showListOfPurchase() {
+    public void printPurchaseList(List<Purchase> purchaseList) {
         if (purchaseList.size() > 0) {
             purchaseList.forEach(System.out::println);
-            System.out.println();
         } else {
             System.out.println("Purchase list is empty\n");
         }
@@ -61,21 +48,21 @@ class BudgetManager {
 
     public boolean processAction() {
         chooseAction();
-        int number = scanner.nextInt();
+        int number = scannerDouble.nextInt();
         switch (number) {
             case 1:
                 System.out.println();
                 System.out.println("Enter Income: ");
-                addIncome(scanner.nextDouble());
+                addIncome(scannerDouble.nextDouble());
                 break;
             case 2:
                 System.out.println();
-                addPurchase();
+                processPurchaseAction();
                 break;
 
             case 3:
                 System.out.println();
-                showListOfPurchase();
+                processPurchasesListAction();
                 break;
             case 4:
                 System.out.println();
@@ -94,5 +81,134 @@ class BudgetManager {
         return true;
     }
 
+    public boolean processPurchaseAction() {
+        while (true) {
+            choosePurchaseAction();
+            switch (scannerDouble.nextInt()) {
+                case 1:
+                    System.out.println();
+                    readPurchase(scannerString, scannerDouble);
+                    Food food = new Food(this.name, this.price);
+                    food.addPurchaseToPurchaseList(food);
+                    food.addPriceToTotalSum();
+                    allPurchaseList.add(food);
+                    this.totalSum += food.getPrice();
+                    this.balance -= food.getPrice();
+                    break;
+                case 2:
+                    System.out.println();
+                    readPurchase(scannerString, scannerDouble);
+                    Clothes clothes = new Clothes(this.name, this.price);
+                    clothes.addPurchaseToPurchaseList(clothes);
+                    clothes.addPriceToTotalSum();
+                    allPurchaseList.add(clothes);
+                    this.totalSum += clothes.getPrice();
+                    this.balance -= clothes.getPrice();
+                    break;
+                case 3:
+                    System.out.println();
+                    readPurchase(scannerString, scannerDouble);
+                    Entertainment entertainment = new Entertainment(this.name, this.price);
+                    entertainment.addPurchaseToPurchaseList(entertainment);
+                    entertainment.addPriceToTotalSum();
+                    allPurchaseList.add(entertainment);
+                    this.totalSum += entertainment.getPrice();
+                    this.balance -= entertainment.getPrice();
+                    break;
+                case 4:
+                    System.out.println();
+                    readPurchase(scannerString, scannerDouble);
+                    Other other = new Other(this.name, this.price);
+                    other.addPurchaseToPurchaseList(other);
+                    other.addPriceToTotalSum();
+                    allPurchaseList.add(other);
+                    this.totalSum += other.getPrice();
+                    this.balance -= other.getPrice();
+                    break;
+                case 5:
+                    System.out.println();
+                    return false;
+            }
+        }
+    }
 
+    public boolean processPurchasesListAction() {
+        while (true) {
+            choosePurchasesListAction();
+            switch (scannerDouble.nextInt()) {
+                case 1:
+                    System.out.println();
+                    System.out.println("Food:");
+                    printPurchaseList(Food.getPurchaseList());
+                    System.out.printf("total sum: $%.2f", Food.getTotalSum());
+                    System.out.println();
+                    System.out.println();
+                    break;
+                case 2:
+                    System.out.println();
+                    System.out.println("Clothes:");
+                    printPurchaseList(Clothes.getPurchaseList());
+                    System.out.printf("total sum: $%.2f", Clothes.getTotalSum());
+                    System.out.println();
+                    System.out.println();
+                    break;
+                case 3:
+                    System.out.println();
+                    System.out.println("Entertainment:");
+                    printPurchaseList(Entertainment.getPurchaseList());
+                    System.out.printf("total sum: $%.2f", Entertainment.getTotalSum());
+                    System.out.println();
+                    System.out.println();
+                    break;
+                case 4:
+                    System.out.println();
+                    System.out.println("Other:");
+                    printPurchaseList(Other.getPurchaseList());
+                    System.out.printf("total sum: $%.2f", Other.getTotalSum());
+                    System.out.println();
+                    System.out.println();
+                    break;
+                case 5:
+                    System.out.println();
+                    System.out.println("All:");
+                    printPurchaseList(allPurchaseList);
+                    System.out.printf("total sum: $%.2f", totalSum);
+                    System.out.println();
+                    System.out.println();
+                    break;
+                case 6:
+                    System.out.println();
+                    return false;
+
+            }
+        }
+    }
+
+    public void chooseAction() {
+        System.out.println("Choose your action:");
+        System.out.println("1) Add income");
+        System.out.println("2) Add purchase");
+        System.out.println("3) Show list of purchase");
+        System.out.println("4) Balance");
+        System.out.println("0) Exit");
+    }
+
+    public void choosePurchaseAction() {
+        System.out.println("Choose the type of purchase:");
+        System.out.println("1) Food");
+        System.out.println("2) Clothes");
+        System.out.println("3) Entertainment");
+        System.out.println("4) Other");
+        System.out.println("5) Back");
+    }
+
+    public void choosePurchasesListAction() {
+        System.out.println("Choose the type of purchase:");
+        System.out.println("1) Food");
+        System.out.println("2) Clothes");
+        System.out.println("3) Entertainment");
+        System.out.println("4) Other");
+        System.out.println("5) All");
+        System.out.println("6) Back");
+    }
 }
